@@ -18,6 +18,14 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
+# Set dummy environment variables for build time
+ENV POSTGRES_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV STRIPE_SECRET_KEY="sk_test_dummy"
+ENV STRIPE_WEBHOOK_SECRET="whsec_dummy"
+ENV BASE_URL="http://localhost:3000"
+ENV AUTH_SECRET="dummy_secret"
+ENV NEXT_TELEMETRY_DISABLED=1
+
 # Enable pnpm and copy dependencies
 RUN corepack enable pnpm
 COPY --from=deps /app/node_modules ./node_modules
