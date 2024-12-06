@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get commit hash
         id: get_commit
-        run: echo "::set-output name=commit_hash::$(git rev-parse HEAD)"
+        run: echo "commit_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
   build-and-push-image:
     needs:
@@ -46,6 +46,12 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ needs.commit-hash.outputs.commit_hash }}
+          build-args: |
+            POSTGRES_URL=${{ secrets.POSTGRES_URL }}
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            BASE_URL=${{ secrets.BASE_URL }}
+            AUTH_SECRET=${{ secrets.AUTH_SECRET }}
 
   deploy:
     runs-on: ubuntu-latest
