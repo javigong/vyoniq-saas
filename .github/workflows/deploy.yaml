@@ -27,12 +27,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set short git commit SHA
-        id: vars
-        run: |
-          calculatedSha=$(git rev-parse --short ${{ github.sha }})
-          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
-
       - name: Log in to the Container registry
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
@@ -61,20 +55,29 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          if_key_exists: replace
+
       - name: create env file
         run: |
-          echo "GIT_COMMIT_HASH=${{ github.sha }}" >> env
+          echo "GIT_COMMIT_HASH=${{ needs.commit-hash.outputs.commit_hash }}" >> env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> env
           echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> env
           echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> env
           echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> env
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> env
+
       - name: "Docker Stack Deploy"
         uses: cssnr/stack-deploy-action@v1
         with:
-          name: "vyoniq-sass"
-          file: "docker-stack.yaml"
+          name: 'vyoniq-sass'
+          file: 'docker-stack.yaml'
           host: vyoniq.com
           user: javier
           ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}
-          env_file: "./env"
+          env_file: './env'
