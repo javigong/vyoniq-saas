@@ -18,9 +18,9 @@ jobs:
       - name: Get commit hash
         id: get_commit
         run: echo "::set-output name=commit_hash::$(git rev-parse HEAD)"
+
   build-and-push-image:
     needs:
-      - build-and-test
       - commit-hash
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +52,6 @@ jobs:
     needs:
       - build-and-push-image
       - commit-hash
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
