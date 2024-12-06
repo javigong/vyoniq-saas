@@ -9,7 +9,7 @@
 # https://github.com/docker/awesome-compose
 services:
   server:
-    image: ghcr.io/dreamsofcode-io/guestbook/guestbook
+    image: ghcr.io/javigong/vyoniq-saas/vyoniq-saas
     container_name: guestbook
     ports:
       - 8080:8080
@@ -18,8 +18,8 @@ services:
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=guestbook
+      - POSTGRES_USER=javier
+      - POSTGRES_DB=vyoniq
       - POSTGRES_PORT=5432
       - POSTGRES_SSLMODE=disable
     depends_on:
