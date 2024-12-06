@@ -25,6 +25,8 @@ ENV STRIPE_WEBHOOK_SECRET="whsec_dummy"
 ENV BASE_URL="http://localhost:3000"
 ENV AUTH_SECRET="dummy_secret"
 ENV NEXT_TELEMETRY_DISABLED=1
+# Skip static generation of dynamic pages
+ENV NEXT_SKIP_INVALID_PRERENDER=true
 
 # Enable pnpm and copy dependencies
 RUN corepack enable pnpm
