@@ -15,9 +15,6 @@ jobs:
       commit_hash: ${{ steps.get_commit.outputs.commit_hash }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: javigong/vyoniq-sass
-
       - name: Get commit hash
         id: get_commit
         run: echo "::set-output name=commit_hash::$(git rev-parse HEAD)"
@@ -56,22 +53,22 @@ jobs:
       - build-and-push-image
       - commit-hash
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: create env file
-      run: |
-        echo "GIT_COMMIT_HASH=${{ github.sha }}" >> env
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> env
-        echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> env
-        echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> env
-        echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> env
-        echo "BASE_URL=${{ secrets.BASE_URL }}" >> env
-    - name: 'Docker Stack Deploy'
-      uses: cssnr/stack-deploy-action@v1
-      with:
-        name: 'vyoniq-sass'
-        file: 'docker-stack.yaml'
-        host: vyoniq.com
-        user: javier
-        ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}
-        env_file: './env'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: create env file
+        run: |
+          echo "GIT_COMMIT_HASH=${{ github.sha }}" >> env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> env
+          echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> env
+          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> env
+          echo "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" >> env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> env
+      - name: "Docker Stack Deploy"
+        uses: cssnr/stack-deploy-action@v1
+        with:
+          name: "vyoniq-sass"
+          file: "docker-stack.yaml"
+          host: vyoniq.com
+          user: javier
+          ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}
+          env_file: "./env"
