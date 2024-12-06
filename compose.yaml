@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    image: ghcr.io/javigong/vyoniq-saas:${GIT_COMMIT_HASH}
+    container_name: vyoniq-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - /env/postgres_url.txt
+      - /env/stripe_secret_key.txt
+      - /env/stripe_webhook_secret.txt
+      - /env/base_url.txt
+      - /env/auth_secret.txt
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: vyoniq-db
+    restart: always
+    user: postgres
+    env_file:
+      - /env/db_password.txt
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=vyoniq
+      - POSTGRES_USER=javier
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data: 
