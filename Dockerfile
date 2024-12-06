@@ -38,6 +38,9 @@ RUN corepack enable pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Create public directory if it doesn't exist
+RUN mkdir -p public
+
 # Build the application
 RUN pnpm build
 
@@ -51,8 +54,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files
-COPY --from=builder /app/public ./public
+# Create necessary directories
+RUN mkdir -p public .next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
