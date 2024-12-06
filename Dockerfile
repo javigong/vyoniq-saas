@@ -18,13 +18,25 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
+# Add build time arguments
+ARG POSTGRES_URL
+ARG STRIPE_SECRET_KEY
+ARG STRIPE_WEBHOOK_SECRET
+ARG BASE_URL
+ARG AUTH_SECRET
+
+# Set environment variables
+ENV POSTGRES_URL="${POSTGRES_URL}"
+ENV STRIPE_SECRET_KEY="${STRIPE_SECRET_KEY}"
+ENV STRIPE_WEBHOOK_SECRET="${STRIPE_WEBHOOK_SECRET}"
+ENV BASE_URL="${BASE_URL}"
+ENV AUTH_SECRET="${AUTH_SECRET}"
+ENV NEXT_TELEMETRY_DISABLED=1
+
 # Enable pnpm and copy dependencies
 RUN corepack enable pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Disable telemetry during the build
-ENV NEXT_TELEMETRY_DISABLED 1
 
 # Build the application
 RUN pnpm build
@@ -33,8 +45,8 @@ RUN pnpm build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -48,7 +60,7 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
